@@ -530,7 +530,7 @@ class _ConfiguracionScreenState extends ConsumerState<ConfiguracionScreen>
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () async {
-                          // TODO: Implementar logout
+                          _showLogoutConfirmation();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFD32F2F),
@@ -1987,6 +1987,15 @@ class _ConfiguracionScreenState extends ConsumerState<ConfiguracionScreen>
             onPressed: () async {
               try {
                 await AuthService.signOut();
+                // Forzar refresh de los proveedores
+                ref.invalidate(authStateProvider);
+                ref.invalidate(currentUserProvider);
+                ref.invalidate(isAuthenticatedProvider);
+                ref.invalidate(userRoleProvider);
+                ref.invalidate(isAdminProvider);
+                ref.invalidate(userDisplayNameProvider);
+                ref.invalidate(userAvatarProvider);
+
                 if (mounted) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -1999,9 +2008,12 @@ class _ConfiguracionScreenState extends ConsumerState<ConfiguracionScreen>
               } catch (e) {
                 if (mounted) {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text('Error: $e')));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error al cerrar sesión: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
                 }
               }
             },

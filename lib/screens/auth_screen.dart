@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/auth_service.dart';
 import 'dart:math' as math;
+import 'dart:ui';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -36,7 +37,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   void initState() {
     super.initState();
 
-    // Main entrance animation
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
@@ -165,10 +165,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     final isLargeScreen = size.width > 900;
 
     final heroSize = isLargeScreen
-        ? size.width * 0.22
+        ? size.width * 0.18
         : isTablet
-        ? size.width * 0.35
-        : size.width * 0.50;
+        ? size.width * 0.28
+        : size.width * 0.42;
 
     return Scaffold(
       body: Container(
@@ -194,727 +194,697 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           ),
         ),
         child: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: IntrinsicHeight(
-                    child: Column(
-                      children: [
-                        FadeTransition(
-                          opacity: _fadeAnimation,
-                          child: ScaleTransition(
-                            scale: _scaleAnimation,
-                            child: Container(
-                              width: double.infinity,
-                              padding: EdgeInsets.symmetric(
-                                vertical: isTablet ? 56 : 40,
-                                horizontal: isLargeScreen
-                                    ? size.width * 0.08
-                                    : 24,
-                              ),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    const Color(0xFFD32F2F).withOpacity(0.15),
-                                    const Color(0xFFD32F2F).withOpacity(0.08),
-                                    const Color(0xFFFF6B6B).withOpacity(0.04),
-                                    Colors.transparent,
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: RepaintBoundary(
+                  child: AnimatedBuilder(
+                    animation: _fireController,
+                    builder: (context, child) {
+                      return CustomPaint(
+                        painter: WaveBackgroundPainter(
+                          animation: _fireController.value,
+                          color: const Color(0xFFD32F2F).withOpacity(0.08),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              Positioned.fill(
+                child: AnimatedBuilder(
+                  animation: _glowController,
+                  builder: (context, child) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        gradient: RadialGradient(
+                          center: Alignment.center,
+                          radius: 1.5 + (_glowAnimation.value * 0.3),
+                          colors: [
+                            const Color(
+                              0xFFFF6B6B,
+                            ).withOpacity(0.12 * _glowAnimation.value),
+                            const Color(
+                              0xFFFFAB40,
+                            ).withOpacity(0.08 * _glowAnimation.value),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              Positioned.fill(
+                child: RepaintBoundary(
+                  child: AnimatedBuilder(
+                    animation: _fireController,
+                    builder: (context, child) {
+                      return CustomPaint(
+                        painter: FullScreenFireParticlesPainter(
+                          animation: _fireController.value,
+                          particleCount: 60,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: EpicPatternPainter(
+                    color: const Color(0xFFD32F2F).withOpacity(0.04),
+                  ),
+                ),
+              ),
+
+              Positioned.fill(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isLargeScreen
+                          ? size.width * 0.12
+                          : isTablet
+                          ? 48
+                          : 24,
+                      vertical: isTablet ? 48 : 32,
+                    ),
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: ScaleTransition(
+                        scale: _scaleAnimation,
+                        child: Column(
+                          children: [
+                            ShaderMask(
+                              shaderCallback: (bounds) => LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  const Color(0xFFD32F2F),
+                                  const Color(0xFFFF6B6B),
+                                  const Color(0xFFFF8A80),
+                                  const Color(0xFFFFAB40),
+                                ],
+                              ).createShader(bounds),
+                              child: Text(
+                                'PUÑOS LIBERTARIOS',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: isLargeScreen
+                                      ? 48
+                                      : isTablet
+                                      ? 40
+                                      : 32,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  letterSpacing: 4,
+                                  height: 1.1,
+                                  shadows: [
+                                    Shadow(
+                                      color: const Color(
+                                        0xFFD32F2F,
+                                      ).withOpacity(0.6),
+                                      blurRadius: 25,
+                                      offset: const Offset(0, 6),
+                                    ),
                                   ],
                                 ),
                               ),
-                              child: Stack(
-                                children: [
-                                  Positioned.fill(
-                                    child: RepaintBoundary(
-                                      child: AnimatedBuilder(
-                                        animation: _fireController,
-                                        builder: (context, child) {
-                                          return CustomPaint(
-                                            painter: WaveBackgroundPainter(
-                                              animation: _fireController.value,
-                                              color: const Color(
-                                                0xFFD32F2F,
-                                              ).withOpacity(0.1),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
+                            ),
 
-                                  Positioned.fill(
-                                    child: AnimatedBuilder(
-                                      animation: _glowController,
+                            SizedBox(height: isTablet ? 48 : 36),
+
+                            RepaintBoundary(
+                              child: SizedBox(
+                                width: heroSize + 100,
+                                height: heroSize + 100,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    // Concentrated fire particles around image
+                                    AnimatedBuilder(
+                                      animation: _fireController,
+                                      builder: (context, child) {
+                                        return CustomPaint(
+                                          size: Size(
+                                            heroSize + 100,
+                                            heroSize + 100,
+                                          ),
+                                          painter: FireParticlesPainter(
+                                            animation: _fireController.value,
+                                            particleCount: 35,
+                                          ),
+                                        );
+                                      },
+                                    ),
+
+                                    // Pulsing glow
+                                    AnimatedBuilder(
+                                      animation: _glowAnimation,
                                       builder: (context, child) {
                                         return Container(
+                                          width: heroSize,
+                                          height: heroSize,
                                           decoration: BoxDecoration(
-                                            gradient: RadialGradient(
-                                              center: Alignment.center,
-                                              radius:
-                                                  0.8 +
-                                                  (_glowAnimation.value * 0.3),
-                                              colors: [
-                                                const Color(
-                                                  0xFFFF6B6B,
-                                                ).withOpacity(
-                                                  0.12 * _glowAnimation.value,
-                                                ),
-                                                const Color(
+                                            shape: BoxShape.circle,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: const Color(0xFFD32F2F)
+                                                    .withOpacity(
+                                                      0.5 *
+                                                          _glowAnimation.value,
+                                                    ),
+                                                blurRadius:
+                                                    70 * _glowAnimation.value,
+                                                spreadRadius:
+                                                    12 * _glowAnimation.value,
+                                              ),
+                                              BoxShadow(
+                                                color: const Color(0xFFFF6B6B)
+                                                    .withOpacity(
+                                                      0.4 *
+                                                          _glowAnimation.value,
+                                                    ),
+                                                blurRadius:
+                                                    55 * _glowAnimation.value,
+                                                spreadRadius:
+                                                    18 * _glowAnimation.value,
+                                              ),
+                                              BoxShadow(
+                                                color: const Color(0xFFFFAB40)
+                                                    .withOpacity(
+                                                      0.3 *
+                                                          _glowAnimation.value,
+                                                    ),
+                                                blurRadius:
+                                                    90 * _glowAnimation.value,
+                                                spreadRadius:
+                                                    8 * _glowAnimation.value,
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+
+                                    // Floating hero image
+                                    AnimatedBuilder(
+                                      animation: _floatAnimation,
+                                      builder: (context, child) {
+                                        return Transform.translate(
+                                          offset: Offset(
+                                            0,
+                                            _floatAnimation.value,
+                                          ),
+                                          child: Container(
+                                            width: heroSize,
+                                            height: heroSize,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                color: const Color(
                                                   0xFFFFAB40,
-                                                ).withOpacity(
-                                                  0.08 * _glowAnimation.value,
-                                                ),
-                                                Colors.transparent,
-                                              ],
+                                                ).withOpacity(0.4),
+                                                width: 3,
+                                              ),
+                                            ),
+                                            child: ClipOval(
+                                              child: Image.asset(
+                                                'assets/images/muayboran.png',
+                                                fit: BoxFit.cover,
+                                                errorBuilder:
+                                                    (
+                                                      context,
+                                                      error,
+                                                      stack,
+                                                    ) => Container(
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                            gradient: LinearGradient(
+                                                              begin: Alignment
+                                                                  .topLeft,
+                                                              end: Alignment
+                                                                  .bottomRight,
+                                                              colors: [
+                                                                Color(
+                                                                  0xFFD32F2F,
+                                                                ),
+                                                                Color(
+                                                                  0xFFB71C1C,
+                                                                ),
+                                                                Color(
+                                                                  0xFF7B1113,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                      child: Center(
+                                                        child: Icon(
+                                                          Icons
+                                                              .sports_martial_arts,
+                                                          size: heroSize * 0.35,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                              ),
                                             ),
                                           ),
                                         );
                                       },
                                     ),
-                                  ),
-
-                                  Positioned.fill(
-                                    child: CustomPaint(
-                                      painter: EpicPatternPainter(
-                                        color: const Color(
-                                          0xFFD32F2F,
-                                        ).withOpacity(0.05),
-                                      ),
-                                    ),
-                                  ),
-
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      ShaderMask(
-                                        shaderCallback: (bounds) =>
-                                            LinearGradient(
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                              colors: [
-                                                const Color(0xFFD32F2F),
-                                                const Color(0xFFFF6B6B),
-                                                const Color(0xFFFF8A80),
-                                                const Color(0xFFFFAB40),
-                                              ],
-                                            ).createShader(bounds),
-                                        child: Text(
-                                          'PUÑOS LIBERTARIOS',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: isLargeScreen
-                                                ? 42
-                                                : isTablet
-                                                ? 36
-                                                : 28,
-                                            fontWeight: FontWeight.w900,
-                                            color: Colors.white,
-                                            letterSpacing: 3.5,
-                                            height: 1.1,
-                                            shadows: [
-                                              Shadow(
-                                                color: const Color(
-                                                  0xFFD32F2F,
-                                                ).withOpacity(0.5),
-                                                blurRadius: 20,
-                                                offset: const Offset(0, 4),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: isTablet ? 40 : 28),
-
-                                      RepaintBoundary(
-                                        child: SizedBox(
-                                          width: heroSize + 120,
-                                          height: heroSize + 120,
-                                          child: Stack(
-                                            alignment: Alignment.center,
-                                            children: [
-                                              AnimatedBuilder(
-                                                animation: _fireController,
-                                                builder: (context, child) {
-                                                  return CustomPaint(
-                                                    size: Size(
-                                                      heroSize + 120,
-                                                      heroSize + 120,
-                                                    ),
-                                                    painter:
-                                                        FireParticlesPainter(
-                                                          animation:
-                                                              _fireController
-                                                                  .value,
-                                                          particleCount: 45,
-                                                        ),
-                                                  );
-                                                },
-                                              ),
-
-                                              AnimatedBuilder(
-                                                animation: _glowAnimation,
-                                                builder: (context, child) {
-                                                  return Container(
-                                                    width: heroSize,
-                                                    height: heroSize,
-                                                    decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color:
-                                                              const Color(
-                                                                0xFFD32F2F,
-                                                              ).withOpacity(
-                                                                0.5 *
-                                                                    _glowAnimation
-                                                                        .value,
-                                                              ),
-                                                          blurRadius:
-                                                              80 *
-                                                              _glowAnimation
-                                                                  .value,
-                                                          spreadRadius:
-                                                              15 *
-                                                              _glowAnimation
-                                                                  .value,
-                                                        ),
-                                                        BoxShadow(
-                                                          color:
-                                                              const Color(
-                                                                0xFFFF6B6B,
-                                                              ).withOpacity(
-                                                                0.4 *
-                                                                    _glowAnimation
-                                                                        .value,
-                                                              ),
-                                                          blurRadius:
-                                                              60 *
-                                                              _glowAnimation
-                                                                  .value,
-                                                          spreadRadius:
-                                                              20 *
-                                                              _glowAnimation
-                                                                  .value,
-                                                        ),
-                                                        BoxShadow(
-                                                          color:
-                                                              const Color(
-                                                                0xFFFFAB40,
-                                                              ).withOpacity(
-                                                                0.3 *
-                                                                    _glowAnimation
-                                                                        .value,
-                                                              ),
-                                                          blurRadius:
-                                                              100 *
-                                                              _glowAnimation
-                                                                  .value,
-                                                          spreadRadius:
-                                                              10 *
-                                                              _glowAnimation
-                                                                  .value,
-                                                        ),
-                                                        BoxShadow(
-                                                          color:
-                                                              const Color(
-                                                                0xFFFFD54F,
-                                                              ).withOpacity(
-                                                                0.2 *
-                                                                    _glowAnimation
-                                                                        .value,
-                                                              ),
-                                                          blurRadius:
-                                                              120 *
-                                                              _glowAnimation
-                                                                  .value,
-                                                          spreadRadius:
-                                                              5 *
-                                                              _glowAnimation
-                                                                  .value,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-
-                                              AnimatedBuilder(
-                                                animation: _floatAnimation,
-                                                builder: (context, child) {
-                                                  return Transform.translate(
-                                                    offset: Offset(
-                                                      0,
-                                                      _floatAnimation.value,
-                                                    ),
-                                                    child: Container(
-                                                      width: heroSize,
-                                                      height: heroSize,
-                                                      decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        border: Border.all(
-                                                          color: const Color(
-                                                            0xFFFFAB40,
-                                                          ).withOpacity(0.3),
-                                                          width: 3,
-                                                        ),
-                                                      ),
-                                                      child: ClipOval(
-                                                        child: Image.asset(
-                                                          'assets/images/muayboran.png',
-                                                          fit: BoxFit.cover,
-                                                          errorBuilder: (context, error, stack) => Container(
-                                                            decoration: const BoxDecoration(
-                                                              gradient: LinearGradient(
-                                                                begin: Alignment
-                                                                    .topLeft,
-                                                                end: Alignment
-                                                                    .bottomRight,
-                                                                colors: [
-                                                                  Color(
-                                                                    0xFFD32F2F,
-                                                                  ),
-                                                                  Color(
-                                                                    0xFFB71C1C,
-                                                                  ),
-                                                                  Color(
-                                                                    0xFF7B1113,
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                            child: Center(
-                                                              child: Icon(
-                                                                Icons
-                                                                    .sports_martial_arts,
-                                                                size:
-                                                                    heroSize *
-                                                                    0.35,
-                                                                color: Colors
-                                                                    .white,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: isTablet ? 32 : 24),
-
-                                      AnimatedBuilder(
-                                        animation: _glowAnimation,
-                                        builder: (context, child) {
-                                          return Transform.scale(
-                                            scale:
-                                                0.98 +
-                                                (0.04 * _glowAnimation.value),
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: isLargeScreen
-                                                    ? 48
-                                                    : isTablet
-                                                    ? 40
-                                                    : 28,
-                                                vertical: isTablet ? 16 : 14,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                gradient: const LinearGradient(
-                                                  begin: Alignment.topLeft,
-                                                  end: Alignment.bottomRight,
-                                                  colors: [
-                                                    Color(0xFFD32F2F),
-                                                    Color(0xFFB71C1C),
-                                                    Color(0xFF7B1113),
-                                                  ],
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(35),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: const Color(
-                                                      0xFFD32F2F,
-                                                    ).withOpacity(0.6),
-                                                    blurRadius: 25,
-                                                    offset: const Offset(0, 10),
-                                                    spreadRadius: 2,
-                                                  ),
-                                                  BoxShadow(
-                                                    color:
-                                                        const Color(
-                                                          0xFFFF6B6B,
-                                                        ).withOpacity(
-                                                          0.4 *
-                                                              _glowAnimation
-                                                                  .value,
-                                                        ),
-                                                    blurRadius: 35,
-                                                    spreadRadius: 5,
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Text(
-                                                _isLogin
-                                                    ? '🏆 BIENVENIDO DE VUELTA 🏆'
-                                                    : '⚡ ÚNETE A LA LUCHA ⚡',
-                                                style: TextStyle(
-                                                  fontSize: isLargeScreen
-                                                      ? 18
-                                                      : isTablet
-                                                      ? 17
-                                                      : 14,
-                                                  fontWeight: FontWeight.w900,
-                                                  color: Colors.white,
-                                                  letterSpacing: 2.2,
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ),
 
-                        Flexible(
-                          child: SlideTransition(
-                            position: _slideAnimation,
-                            child: FadeTransition(
-                              opacity: _fadeAnimation,
-                              child: Container(
-                                width: double.infinity,
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: isLargeScreen
-                                      ? size.width * 0.15
-                                      : isTablet
-                                      ? 64
-                                      : 24,
-                                  vertical: isTablet ? 40 : 24,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isDark
-                                      ? const Color(
-                                          0xFF1a1a2e,
-                                        ).withOpacity(0.95)
-                                      : Colors.white.withOpacity(0.98),
-                                  borderRadius: BorderRadius.circular(36),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(
-                                        0xFFD32F2F,
-                                      ).withOpacity(0.2),
-                                      blurRadius: 50,
-                                      offset: const Offset(0, 20),
-                                      spreadRadius: 8,
-                                    ),
-                                    BoxShadow(
-                                      color: const Color(
-                                        0xFFFF6B6B,
-                                      ).withOpacity(0.15),
-                                      blurRadius: 35,
-                                      offset: const Offset(0, 12),
-                                      spreadRadius: 4,
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(
-                                        isDark ? 0.6 : 0.1,
-                                      ),
-                                      blurRadius: 30,
-                                      offset: const Offset(0, 10),
-                                    ),
-                                  ],
-                                  border: Border.all(
-                                    color: const Color(
-                                      0xFFD32F2F,
-                                    ).withOpacity(0.15),
-                                    width: 2,
-                                  ),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(36),
-                                  child: SingleChildScrollView(
-                                    padding: EdgeInsets.all(
-                                      isLargeScreen
+                            SizedBox(height: isTablet ? 36 : 28),
+
+                            AnimatedBuilder(
+                              animation: _glowAnimation,
+                              builder: (context, child) {
+                                return Transform.scale(
+                                  scale: 0.98 + (0.04 * _glowAnimation.value),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: isLargeScreen
                                           ? 48
                                           : isTablet
                                           ? 40
                                           : 32,
+                                      vertical: isTablet ? 18 : 16,
                                     ),
-                                    child: Form(
-                                      key: _formKey,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          AnimatedSize(
-                                            duration: const Duration(
-                                              milliseconds: 300,
-                                            ),
-                                            curve: Curves.easeInOut,
-                                            child: Column(
-                                              children: [
-                                                if (!_isLogin) ...[
-                                                  _buildTextField(
-                                                    controller: _nameController,
-                                                    label: 'Nombre Completo',
-                                                    icon: Icons.person_outline,
-                                                    isDark: isDark,
-                                                    isTablet: isTablet,
-                                                    isLargeScreen:
-                                                        isLargeScreen,
-                                                    validator: (v) =>
-                                                        v?.isEmpty ?? true
-                                                        ? 'Requerido'
-                                                        : null,
-                                                  ),
-                                                  SizedBox(
-                                                    height: isTablet ? 24 : 20,
-                                                  ),
-                                                ],
-                                              ],
-                                            ),
-                                          ),
-
-                                          _buildTextField(
-                                            controller: _emailController,
-                                            label: 'Email',
-                                            icon: Icons.email_outlined,
-                                            isDark: isDark,
-                                            isTablet: isTablet,
-                                            isLargeScreen: isLargeScreen,
-                                            keyboardType:
-                                                TextInputType.emailAddress,
-                                            validator: (v) {
-                                              if (v?.isEmpty ?? true) {
-                                                return 'Requerido';
-                                              }
-                                              if (!v!.contains('@')) {
-                                                return 'Email inválido';
-                                              }
-                                              return null;
-                                            },
-                                          ),
-                                          SizedBox(height: isTablet ? 24 : 20),
-
-                                          _buildTextField(
-                                            controller: _passwordController,
-                                            label: 'Contraseña',
-                                            icon: Icons.lock_outline,
-                                            isDark: isDark,
-                                            isTablet: isTablet,
-                                            isLargeScreen: isLargeScreen,
-                                            obscureText: _obscurePassword,
-                                            suffixIcon: IconButton(
-                                              icon: Icon(
-                                                _obscurePassword
-                                                    ? Icons
-                                                          .visibility_off_outlined
-                                                    : Icons.visibility_outlined,
-                                                color: const Color(0xFFD32F2F),
-                                                size: isTablet ? 24 : 22,
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          Color(0xFFD32F2F),
+                                          Color(0xFFB71C1C),
+                                          Color(0xFF7B1113),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(35),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(
+                                            0xFFD32F2F,
+                                          ).withOpacity(0.6),
+                                          blurRadius: 25,
+                                          offset: const Offset(0, 10),
+                                          spreadRadius: 2,
+                                        ),
+                                        BoxShadow(
+                                          color: const Color(0xFFFF6B6B)
+                                              .withOpacity(
+                                                0.4 * _glowAnimation.value,
                                               ),
-                                              onPressed: () => setState(
-                                                () => _obscurePassword =
-                                                    !_obscurePassword,
-                                              ),
+                                          blurRadius: 35,
+                                          spreadRadius: 5,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Text(
+                                      _isLogin
+                                          ? '🏆 BIENVENIDO DE VUELTA 🏆'
+                                          : '⚡ ÚNETE A LA LUCHA ⚡',
+                                      style: TextStyle(
+                                        fontSize: isLargeScreen
+                                            ? 18
+                                            : isTablet
+                                            ? 17
+                                            : 15,
+                                        fontWeight: FontWeight.w900,
+                                        color: Colors.white,
+                                        letterSpacing: 2.2,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+
+                            SizedBox(height: isTablet ? 48 : 36),
+
+                            SlideTransition(
+                              position: _slideAnimation,
+                              child: AnimatedBuilder(
+                                animation: _glowAnimation,
+                                builder: (context, child) {
+                                  return Container(
+                                    constraints: BoxConstraints(
+                                      maxWidth: isLargeScreen
+                                          ? 650
+                                          : double.infinity,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(32),
+                                      border: Border.all(
+                                        color: const Color(0xFFFF6B6B)
+                                            .withOpacity(
+                                              0.3 * _glowAnimation.value,
                                             ),
-                                            validator: (v) {
-                                              if (v?.isEmpty ?? true) {
-                                                return 'Requerido';
-                                              }
-                                              if (v!.length < 6) {
-                                                return 'Mínimo 6 caracteres';
-                                              }
-                                              return null;
-                                            },
-                                          ),
-
-                                          SizedBox(height: isTablet ? 44 : 32),
-
-                                          AnimatedBuilder(
-                                            animation: _glowAnimation,
-                                            builder: (context, child) {
-                                              return Container(
-                                                height: isLargeScreen
-                                                    ? 72
-                                                    : isTablet
-                                                    ? 70
-                                                    : 64,
-                                                decoration: BoxDecoration(
-                                                  gradient:
-                                                      const LinearGradient(
-                                                        begin:
-                                                            Alignment.topLeft,
-                                                        end: Alignment
-                                                            .bottomRight,
-                                                        colors: [
-                                                          Color(0xFFD32F2F),
-                                                          Color(0xFFB71C1C),
-                                                          Color(0xFF7B1113),
-                                                        ],
+                                        width: 2,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFFD32F2F)
+                                              .withOpacity(
+                                                0.25 * _glowAnimation.value,
+                                              ),
+                                          blurRadius: 40,
+                                          offset: const Offset(0, 15),
+                                          spreadRadius: 5,
+                                        ),
+                                        BoxShadow(
+                                          color: const Color(0xFFFF6B6B)
+                                              .withOpacity(
+                                                0.2 * _glowAnimation.value,
+                                              ),
+                                          blurRadius: 60,
+                                          spreadRadius: 10,
+                                        ),
+                                      ],
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(32),
+                                      child: BackdropFilter(
+                                        filter: ImageFilter.blur(
+                                          sigmaX: 20,
+                                          sigmaY: 20,
+                                        ),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: isDark
+                                                  ? [
+                                                      const Color(
+                                                        0xFF1a1a2e,
+                                                      ).withOpacity(0.7),
+                                                      const Color(
+                                                        0xFF16213E,
+                                                      ).withOpacity(0.6),
+                                                    ]
+                                                  : [
+                                                      Colors.white.withOpacity(
+                                                        0.7,
                                                       ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                  boxShadow: [
-                                                    BoxShadow(
+                                                      Colors.white.withOpacity(
+                                                        0.5,
+                                                      ),
+                                                    ],
+                                            ),
+                                          ),
+                                          padding: EdgeInsets.all(
+                                            isLargeScreen
+                                                ? 48
+                                                : isTablet
+                                                ? 40
+                                                : 32,
+                                          ),
+                                          child: Form(
+                                            key: _formKey,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.stretch,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                AnimatedSize(
+                                                  duration: const Duration(
+                                                    milliseconds: 300,
+                                                  ),
+                                                  curve: Curves.easeInOut,
+                                                  child: Column(
+                                                    children: [
+                                                      if (!_isLogin) ...[
+                                                        _buildTextField(
+                                                          controller:
+                                                              _nameController,
+                                                          label:
+                                                              'Nombre Completo',
+                                                          icon: Icons
+                                                              .person_outline,
+                                                          isDark: isDark,
+                                                          isTablet: isTablet,
+                                                          isLargeScreen:
+                                                              isLargeScreen,
+                                                          validator: (v) =>
+                                                              v?.isEmpty ?? true
+                                                              ? 'Requerido'
+                                                              : null,
+                                                        ),
+                                                        SizedBox(
+                                                          height: isTablet
+                                                              ? 24
+                                                              : 20,
+                                                        ),
+                                                      ],
+                                                    ],
+                                                  ),
+                                                ),
+
+                                                _buildTextField(
+                                                  controller: _emailController,
+                                                  label: 'Email',
+                                                  icon: Icons.email_outlined,
+                                                  isDark: isDark,
+                                                  isTablet: isTablet,
+                                                  isLargeScreen: isLargeScreen,
+                                                  keyboardType: TextInputType
+                                                      .emailAddress,
+                                                  validator: (v) {
+                                                    if (v?.isEmpty ?? true)
+                                                      return 'Requerido';
+                                                    if (!v!.contains('@'))
+                                                      return 'Email inválido';
+                                                    return null;
+                                                  },
+                                                ),
+                                                SizedBox(
+                                                  height: isTablet ? 24 : 20,
+                                                ),
+
+                                                _buildTextField(
+                                                  controller:
+                                                      _passwordController,
+                                                  label: 'Contraseña',
+                                                  icon: Icons.lock_outline,
+                                                  isDark: isDark,
+                                                  isTablet: isTablet,
+                                                  isLargeScreen: isLargeScreen,
+                                                  obscureText: _obscurePassword,
+                                                  suffixIcon: IconButton(
+                                                    icon: Icon(
+                                                      _obscurePassword
+                                                          ? Icons
+                                                                .visibility_off_outlined
+                                                          : Icons
+                                                                .visibility_outlined,
                                                       color: const Color(
                                                         0xFFD32F2F,
-                                                      ).withOpacity(0.6),
-                                                      blurRadius: 25,
-                                                      offset: const Offset(
-                                                        0,
-                                                        10,
                                                       ),
-                                                      spreadRadius: 3,
+                                                      size: isTablet ? 24 : 22,
                                                     ),
-                                                    BoxShadow(
-                                                      color:
-                                                          const Color(
-                                                            0xFFFF6B6B,
-                                                          ).withOpacity(
-                                                            0.4 *
-                                                                _glowAnimation
-                                                                    .value,
-                                                          ),
-                                                      blurRadius: 40,
-                                                      spreadRadius: 6,
+                                                    onPressed: () => setState(
+                                                      () => _obscurePassword =
+                                                          !_obscurePassword,
                                                     ),
-                                                  ],
+                                                  ),
+                                                  validator: (v) {
+                                                    if (v?.isEmpty ?? true)
+                                                      return 'Requerido';
+                                                    if (v!.length < 6)
+                                                      return 'Mínimo 6 caracteres';
+                                                    return null;
+                                                  },
                                                 ),
-                                                child: Material(
-                                                  color: Colors.transparent,
-                                                  child: InkWell(
-                                                    onTap: _isLoading
-                                                        ? null
-                                                        : _handleEmailAuth,
+
+                                                SizedBox(
+                                                  height: isTablet ? 44 : 36,
+                                                ),
+
+                                                Container(
+                                                  height: isLargeScreen
+                                                      ? 72
+                                                      : isTablet
+                                                      ? 70
+                                                      : 64,
+                                                  decoration: BoxDecoration(
+                                                    gradient:
+                                                        const LinearGradient(
+                                                          begin:
+                                                              Alignment.topLeft,
+                                                          end: Alignment
+                                                              .bottomRight,
+                                                          colors: [
+                                                            Color(0xFFD32F2F),
+                                                            Color(0xFFB71C1C),
+                                                            Color(0xFF7B1113),
+                                                          ],
+                                                        ),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                           20,
                                                         ),
-                                                    child: Center(
-                                                      child: _isLoading
-                                                          ? SizedBox(
-                                                              width: 32,
-                                                              height: 32,
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                                    strokeWidth:
-                                                                        3.5,
-                                                                    color: Colors
-                                                                        .white,
-                                                                  ),
-                                                            )
-                                                          : Text(
-                                                              _isLogin
-                                                                  ? '🔥 INICIAR SESIÓN 🔥'
-                                                                  : '⚡ REGISTRARSE ⚡',
-                                                              style: TextStyle(
-                                                                fontSize:
-                                                                    isLargeScreen
-                                                                    ? 20
-                                                                    : isTablet
-                                                                    ? 19
-                                                                    : 17,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w900,
-                                                                color: Colors
-                                                                    .white,
-                                                                letterSpacing:
-                                                                    2.2,
-                                                              ),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: const Color(
+                                                          0xFFD32F2F,
+                                                        ).withOpacity(0.6),
+                                                        blurRadius: 25,
+                                                        offset: const Offset(
+                                                          0,
+                                                          10,
+                                                        ),
+                                                        spreadRadius: 3,
+                                                      ),
+                                                      BoxShadow(
+                                                        color:
+                                                            const Color(
+                                                              0xFFFF6B6B,
+                                                            ).withOpacity(
+                                                              0.4 *
+                                                                  _glowAnimation
+                                                                      .value,
                                                             ),
+                                                        blurRadius: 40,
+                                                        spreadRadius: 6,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Material(
+                                                    color: Colors.transparent,
+                                                    child: InkWell(
+                                                      onTap: _isLoading
+                                                          ? null
+                                                          : _handleEmailAuth,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            20,
+                                                          ),
+                                                      child: Center(
+                                                        child: _isLoading
+                                                            ? const SizedBox(
+                                                                width: 32,
+                                                                height: 32,
+                                                                child: CircularProgressIndicator(
+                                                                  strokeWidth:
+                                                                      3.5,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                              )
+                                                            : Text(
+                                                                _isLogin
+                                                                    ? '🔥 INICIAR SESIÓN 🔥'
+                                                                    : '⚡ REGISTRARSE ⚡',
+                                                                style: TextStyle(
+                                                                  fontSize:
+                                                                      isLargeScreen
+                                                                      ? 20
+                                                                      : isTablet
+                                                                      ? 19
+                                                                      : 17,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w900,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  letterSpacing:
+                                                                      2.2,
+                                                                ),
+                                                              ),
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
-                                              );
-                                            },
-                                          ),
 
-                                          SizedBox(height: isTablet ? 32 : 28),
+                                                SizedBox(
+                                                  height: isTablet ? 32 : 28,
+                                                ),
 
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                _isLogin
-                                                    ? '¿No tienes cuenta?'
-                                                    : '¿Ya tienes cuenta?',
-                                                style: TextStyle(
-                                                  color: isDark
-                                                      ? Colors.grey[400]
-                                                      : Colors.grey[600],
-                                                  fontSize: isLargeScreen
-                                                      ? 16
-                                                      : isTablet
-                                                      ? 15
-                                                      : 14,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 6),
-                                              TextButton(
-                                                onPressed: () {
-                                                  setState(
-                                                    () => _isLogin = !_isLogin,
-                                                  );
-                                                },
-                                                style: TextButton.styleFrom(
-                                                  padding: EdgeInsets.symmetric(
-                                                    horizontal: 14,
-                                                    vertical: 10,
-                                                  ),
-                                                ),
-                                                child: Text(
-                                                  _isLogin
-                                                      ? 'Regístrate'
-                                                      : 'Inicia sesión',
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w900,
-                                                    color: const Color(
-                                                      0xFFD32F2F,
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      _isLogin
+                                                          ? '¿No tienes cuenta?'
+                                                          : '¿Ya tienes cuenta?',
+                                                      style: TextStyle(
+                                                        color: isDark
+                                                            ? Colors.grey[300]
+                                                            : Colors.grey[700],
+                                                        fontSize: isLargeScreen
+                                                            ? 16
+                                                            : isTablet
+                                                            ? 15
+                                                            : 14,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
                                                     ),
-                                                    fontSize: isLargeScreen
-                                                        ? 16
-                                                        : isTablet
-                                                        ? 15
-                                                        : 14,
-                                                    letterSpacing: 0.5,
-                                                  ),
+                                                    const SizedBox(width: 6),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        setState(
+                                                          () => _isLogin =
+                                                              !_isLogin,
+                                                        );
+                                                      },
+                                                      style: TextButton.styleFrom(
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                              horizontal: 14,
+                                                              vertical: 10,
+                                                            ),
+                                                      ),
+                                                      child: Text(
+                                                        _isLogin
+                                                            ? 'Regístrate'
+                                                            : 'Inicia sesión',
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w900,
+                                                          color: const Color(
+                                                            0xFFD32F2F,
+                                                          ),
+                                                          fontSize:
+                                                              isLargeScreen
+                                                              ? 16
+                                                              : isTablet
+                                                              ? 15
+                                                              : 14,
+                                                          letterSpacing: 0.5,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
-                                        ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ),
+                                  );
+                                },
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              );
-            },
+              ),
+            ],
           ),
         ),
       ),
@@ -933,103 +903,164 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     Widget? suffixIcon,
     String? Function(String?)? validator,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF2D2D2D) : Colors.grey[50],
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color(0xFFD32F2F).withOpacity(0.3),
-          width: 2.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFD32F2F).withOpacity(0.08),
-            blurRadius: 15,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: keyboardType,
-        obscureText: obscureText,
-        style: TextStyle(
-          color: isDark ? Colors.white : Colors.black87,
-          fontSize: isLargeScreen
-              ? 18
-              : isTablet
-              ? 17
-              : 16,
-          fontWeight: FontWeight.w600,
-        ),
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: TextStyle(
-            color: isDark ? Colors.grey[400] : Colors.grey[600],
-            fontWeight: FontWeight.w700,
-            fontSize: isLargeScreen
-                ? 17
-                : isTablet
-                ? 16
-                : 15,
-          ),
-          prefixIcon: Container(
-            margin: const EdgeInsets.all(14),
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFFD32F2F),
-                  Color(0xFFB71C1C),
-                  Color(0xFF7B1113),
-                ],
+    return AnimatedBuilder(
+      animation: _glowAnimation,
+      builder: (context, child) {
+        return Container(
+          decoration: BoxDecoration(
+            color: (isDark ? const Color(0xFF2D2D2D) : Colors.white)
+                .withOpacity(0.6),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: const Color(
+                0xFFD32F2F,
+              ).withOpacity(0.3 + (0.2 * _glowAnimation.value)),
+              width: 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(
+                  0xFFD32F2F,
+                ).withOpacity(0.15 * _glowAnimation.value),
+                blurRadius: 20,
+                offset: const Offset(0, 5),
               ),
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFD32F2F).withOpacity(0.4),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: isLargeScreen
-                  ? 24
+            ],
+          ),
+          child: TextFormField(
+            controller: controller,
+            keyboardType: keyboardType,
+            obscureText: obscureText,
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black87,
+              fontSize: isLargeScreen
+                  ? 18
                   : isTablet
-                  ? 22
-                  : 20,
+                  ? 17
+                  : 16,
+              fontWeight: FontWeight.w600,
             ),
+            decoration: InputDecoration(
+              labelText: label,
+              labelStyle: TextStyle(
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                fontWeight: FontWeight.w700,
+                fontSize: isLargeScreen
+                    ? 17
+                    : isTablet
+                    ? 16
+                    : 15,
+              ),
+              prefixIcon: Container(
+                margin: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFFD32F2F),
+                      Color(0xFFB71C1C),
+                      Color(0xFF7B1113),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFD32F2F).withOpacity(0.4),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  icon,
+                  color: Colors.white,
+                  size: isLargeScreen
+                      ? 24
+                      : isTablet
+                      ? 22
+                      : 20,
+                ),
+              ),
+              suffixIcon: suffixIcon,
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 22,
+                vertical: isLargeScreen
+                    ? 26
+                    : isTablet
+                    ? 24
+                    : 22,
+              ),
+              errorStyle: TextStyle(
+                fontSize: isTablet ? 13 : 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            validator: validator,
           ),
-          suffixIcon: suffixIcon,
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: 22,
-            vertical: isLargeScreen
-                ? 26
-                : isTablet
-                ? 24
-                : 22,
-          ),
-          errorStyle: TextStyle(
-            fontSize: isTablet ? 13 : 12,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        validator: validator,
-      ),
+        );
+      },
     );
   }
+}
+
+class FullScreenFireParticlesPainter extends CustomPainter {
+  final double animation;
+  final int particleCount;
+  final math.Random _random = math.Random(123);
+
+  FullScreenFireParticlesPainter({
+    required this.animation,
+    this.particleCount = 50,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (int i = 0; i < particleCount; i++) {
+      final particleProgress = (animation + (i / particleCount)) % 1.0;
+
+      // Distribute particles across the width
+      final xPosition = (i / particleCount) * size.width;
+      final xVariation = math.sin(animation * 2 * math.pi + i) * 40;
+      final x = xPosition + xVariation;
+
+      // Particles rise from bottom to top
+      final y = size.height - (particleProgress * size.height * 1.2);
+
+      // Particle size decreases as it rises
+      final particleSize =
+          (1 - particleProgress) * (3 + _random.nextDouble() * 5);
+
+      // Opacity fades out
+      final opacity = (1 - particleProgress) * 0.6;
+
+      // Fire colors
+      final colorProgress = particleProgress;
+      final color = Color.lerp(
+        const Color(0xFFFF6B6B),
+        colorProgress < 0.5 ? const Color(0xFFFFAB40) : const Color(0xFFFFD54F),
+        colorProgress,
+      )!.withOpacity(opacity);
+
+      final paint = Paint()
+        ..color = color
+        ..style = PaintingStyle.fill
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+
+      canvas.drawCircle(Offset(x, y), particleSize, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(FullScreenFireParticlesPainter oldDelegate) => true;
 }
 
 class FireParticlesPainter extends CustomPainter {
   final double animation;
   final int particleCount;
-  final math.Random _random = math.Random(42); // Fixed seed for consistency
+  final math.Random _random = math.Random(42);
 
   FireParticlesPainter({required this.animation, this.particleCount = 30});
 
@@ -1043,7 +1074,6 @@ class FireParticlesPainter extends CustomPainter {
       final particleProgress = (animation + (i / particleCount)) % 1.0;
       final angle = (i / particleCount) * 2 * math.pi;
 
-      // Particles rise up and fade out
       final x =
           centerX +
           math.cos(angle) * radius * (0.5 + _random.nextDouble() * 0.5);
@@ -1052,14 +1082,10 @@ class FireParticlesPainter extends CustomPainter {
           math.sin(angle) * radius * 0.3 -
           (particleProgress * size.height * 0.4);
 
-      // Particle size decreases as it rises
       final particleSize =
           (1 - particleProgress) * (4 + _random.nextDouble() * 6);
-
-      // Opacity fades out
       final opacity = (1 - particleProgress) * 0.8;
 
-      // Fire colors: red -> orange -> yellow
       final colorProgress = particleProgress;
       final color = Color.lerp(
         const Color(0xFFFF6B6B),
@@ -1094,7 +1120,6 @@ class WaveBackgroundPainter extends CustomPainter {
 
     final path = Path();
 
-    // Create multiple wave layers
     for (int layer = 0; layer < 3; layer++) {
       final layerOffset = layer * 0.3;
       final waveHeight = 30.0 + (layer * 10);
